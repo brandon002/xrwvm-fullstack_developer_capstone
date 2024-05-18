@@ -5,8 +5,17 @@ const cors = require('cors')
 const app = express()
 const port = 3030;
 
-app.use(cors())
+// app.use(cors())
 app.use(require('body-parser').urlencoded({ extended: false }));
+const corsOptions = {
+    origin: 'http://localhost:8000', // Replace with the origin you want to allow
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Preflight response for all routes
 
 const reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
 const dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
@@ -60,6 +69,7 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 app.get('/fetchDealers', async (req, res) => {
   try{
     const result = await Dealerships.find();
+    console.log("p")
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({message: err.message})

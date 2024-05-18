@@ -2,6 +2,9 @@
 # import requests
 import os
 from dotenv import load_dotenv
+import requests
+from django.http import JsonResponse
+import logging
 
 load_dotenv()
 
@@ -23,11 +26,17 @@ def get_request(endpoint, **kwargs):
     print("GET from {} ".format(request_url))
     try:
         response = requests.get(request_url)
+        response.raise_for_status()
         return response.json()
-    except:
-        print("Network exception occurred")
+    except requests.exceptions.HTTPError as http_err:
+        logger.error(f'HTTP error occurred: {http_err}')
+        return JsonResponse({'error': 'HTTP error occurred', 'details': str(http_err)}, status=500)
+    except requests.exceptions.RequestException as req_err:
+        logger.error(f'Network exception occurred: {req_err}')
+        return JsonResponse({'error': 'Network exception occurred', 'details': str(req_err)}, status=500)
 
 def analyze_review_sentiments(text):
+    print(sentiment_analyzer_url)
     request_url = sentiment_analyzer_url+"analyze/"+text
     try:
         response = requests.get(request_url)
