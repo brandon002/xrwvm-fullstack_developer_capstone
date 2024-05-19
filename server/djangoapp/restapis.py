@@ -18,8 +18,8 @@ sentiment_analyzer_url = os.getenv(
 def get_request(endpoint, **kwargs):
     params = ""
     if (kwargs):
-        for key,value in kwargs.items():
-            params=params+key+"="+value+"&"
+        for key, value in kwargs.items():
+            params += key + "=" + value + "&"
 
     request_url = backend_url+endpoint+"?"+params
 
@@ -28,12 +28,9 @@ def get_request(endpoint, **kwargs):
         response = requests.get(request_url)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.HTTPError as http_err:
-        logger.error(f'HTTP error occurred: {http_err}')
-        return JsonResponse({'error': 'HTTP error occurred', 'details': str(http_err)}, status=500)
-    except requests.exceptions.RequestException as req_err:
-        logger.error(f'Network exception occurred: {req_err}')
-        return JsonResponse({'error': 'Network exception occurred', 'details': str(req_err)}, status=500)
+    except:
+        print("Network exception occurred")
+
 
 def analyze_review_sentiments(text):
     print(sentiment_analyzer_url)
@@ -45,12 +42,13 @@ def analyze_review_sentiments(text):
         print(f"Unexpected {err=}, {type(err)=}")
         print("Network exception occurred")
 
+
 def post_review(data_dict):
     request_url = backend_url+"/insert_review"
     try:
-        response = requests.post(request_url,json=data_dict)
+        response = requests.post(request_url, json=data_dict)
         print(response.json())
         return response.json()
     except:
         print("Network exception occurred")
-# Add code for posting review
+
